@@ -1,0 +1,72 @@
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_DB: travel
+      POSTGRES_USER: travel
+      POSTGRES_PASSWORD: travel
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ai-travel-assistant
+    ports:
+      - "${SERVER_PORT}:8080"
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_started
+      ollama-init:
+        condition: service_completed_successfully
+
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "ollama", "list" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  ollama-init:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
+    restart: "no"
+    entrypoint:
+      - sh
+      - -c
+      - |
+        echo "Checking model ${OLLAMA_MODEL}"
+        if ollama list | grep -q "${OLLAMA_MODEL}"; then
+          echo "Model already installed"
+        else
+          echo "Downloading model ${OLLAMA_MODEL}"
+          ollama pull "${OLLAMA_MODEL}"
+        fi
+        echo "Model ready"
+
+volumes:
+  postgres_data:
+  ollama_data:

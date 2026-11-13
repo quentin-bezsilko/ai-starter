@@ -1,0 +1,42 @@
+server:
+  servlet:
+    context-path: /aistarter
+
+spring:
+  ai:
+    ollama:
+      base-url: ${OLLAMA_URL:http://ollama:11434}
+      chat:
+        options:
+          model: ${OLLAMA_MODEL:qwen2.5:7b}
+          temperature: 0.7
+          num-predict: ${OLLAMA_NUM_PREDICT:2000}
+      embedding:
+        options:
+          model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
+  datasource:
+    url: jdbc:postgresql://postgres:5432/travel
+    username: travel
+    password: travel
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+
+travel:
+  prompt:
+    plan-template: ${TRAVEL_PLAN_TEMPLATE:prompts/travel-plan.st}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

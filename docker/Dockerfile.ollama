@@ -1,0 +1,6 @@
+FROM ollama/ollama:latest
+
+COPY cert_M_X5C_sase-mob-sslfwd-trust-ca.crt \
+     /usr/local/share/ca-certificates/
+
+RUN update-ca-certificates
