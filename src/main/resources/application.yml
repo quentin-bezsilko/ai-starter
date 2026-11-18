@@ -4,29 +4,34 @@ server:
 
 spring:
   ai:
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: never
     ollama:
-      base-url: ${OLLAMA_URL:http://ollama:11434}
+      base-url: ${OLLAMA_URL}
       chat:
         options:
-          model: ${OLLAMA_MODEL:qwen2.5:7b}
-          temperature: 0.7
-          num-predict: ${OLLAMA_NUM_PREDICT:2000}
+          model: ${OLLAMA_MODEL}
+          temperature: ${OLLAMA_TEMPERATURE:0.7}
+          num-predict: ${OLLAMA_NUM_PREDICT:3500}
       embedding:
         options:
-          model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
+          model: ${OLLAMA_EMBEDDING_MODEL}
+      vectorstore:
+        pgvector:
+          initialize-schema: false
+          index-type: HNSW
+          distance-type: COSINE_DISTANCE
+          dimensions: 768
   datasource:
-    url: jdbc:postgresql://postgres:5432/travel
-    username: travel
-    password: travel
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yml
-
-travel:
-  prompt:
-    plan-template: ${TRAVEL_PLAN_TEMPLATE:prompts/travel-plan.st}
 
 springdoc:
   api-docs:

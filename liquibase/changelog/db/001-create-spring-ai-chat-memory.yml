@@ -1,0 +1,55 @@
+
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-spring-ai-chat-memory
+      author: qbe
+      changes:
+        - createTable:
+            tableName: spring_ai_chat_memory
+            columns:
+              - column:
+                  name: conversation_id
+                  type: varchar(36)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: timestamp
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sequence_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: >
+              ALTER TABLE spring_ai_chat_memory
+              ADD CONSTRAINT chk_spring_ai_chat_memory_type
+              CHECK (type IN ('USER', 'ASSISTANT', 'SYSTEM', 'TOOL'));
+        - createIndex:
+            tableName: spring_ai_chat_memory
+            indexName: spring_ai_chat_memory_conversation_id_timestamp_idx
+            columns:
+              - column:
+                  name: conversation_id
+              - column:
+                  name: timestamp
+        - createIndex:
+            tableName: spring_ai_chat_memory
+            indexName: spring_ai_chat_memory_conversation_id_sequence_id_idx
+            columns:
+              - column:
+                  name: conversation_id
+              - column:
+                  name: sequence_id

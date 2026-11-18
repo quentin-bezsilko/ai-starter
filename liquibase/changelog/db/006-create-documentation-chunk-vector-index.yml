@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-documentation-chunk-vector-index
+      author: qbe
+      changes:
+        - sql:
+            sql: >
+              CREATE INDEX idx_documentation_chunk_embedding
+              ON documentation_chunk
+              USING hnsw (embedding vector_cosine_ops);

@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - include:
+      file: db/001-create-spring-ai-chat-memory.yml
+      relativeToChangelogFile: true
+  - include:
+      file: db/002-create-conversation.yml
+      relativeToChangelogFile: true
+  - include:
+      file: db/003-create-message.yml
+      relativeToChangelogFile: true
+  - include:
+      file: db/004-create-documentation-tables.yml
+      relativeToChangelogFile: true
+  - include:
+      file: db/005-insert-documentation-changes.yml
+      relativeToChangelogFile: true
+  - include:
+        file: db/006-create-documentation-chunk-vector-index.yml
+        relativeToChangelogFile: true

@@ -1,10 +1,6 @@
 package com.qbe.aistarter.mcp;
 
-import com.qbe.aistarter.entity.TravelPlanEntity;
-import com.qbe.aistarter.repository.TravelPlanRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,7 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TravelMcp {
 
-    private final TravelPlanRepository repository;
+    /*private final TravelPlanRepository repository;
 
     @Tool(description = "Retrieve a travel plan by conversation id")
     public String getTravelPlan(String conversationId) {
@@ -47,5 +43,5 @@ public class TravelMcp {
                 .findTopByOrderByCreationDateDesc()
                 .map(TravelPlanEntity::getResponseJson)
                 .orElse("No travel plan found");
-    }
+    }*/
 }
