@@ -2,6 +2,12 @@ databaseChangeLog:
   - changeSet:
       id: 006-create-documentation-chunk-vector-index
       author: qbe
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - indexExists:
+                indexName: idx_documentation_chunk_embedding
+                tableName: documentation_chunk
       changes:
         - sql:
             sql: >

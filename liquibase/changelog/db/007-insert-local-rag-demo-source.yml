@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 015-insert-local-rag-demo-source
+      author: qbe
+      changes:
+        - insert:
+            tableName: documentation_source
+            columns:
+              - column:
+                  name: name
+                  value: Spring AI RAG demo (local Markdown)
+              - column:
+                  name: technology
+                  value: SPRING_AI
+              - column:
+                  name: source_type
+                  value: FILE
+              - column:
+                  name: url
+                  value: classpath:knowledge/spring-ai-rag-demo.md
+              - column:
+                  name: version
+                  value: demo-1
+              - column:
+                  name: enabled
+                  valueBoolean: true
+              - column:
+                  name: crawl_enabled
+                  valueBoolean: false
+              - column:
+                  name: max_depth
+                  valueNumeric: 0

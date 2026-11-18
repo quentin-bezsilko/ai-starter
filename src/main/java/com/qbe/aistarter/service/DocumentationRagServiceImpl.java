@@ -26,7 +26,6 @@ public class DocumentationRagServiceImpl implements DocumentationRagService {
      */
     @Override
     public RagResponse generateAnswer(String question, ResponseLevelDto responseLevel) {
-
         if (!StringUtils.hasText(question)) {
             throw new IllegalArgumentException("Question cannot be empty");
         }
@@ -92,7 +91,6 @@ public class DocumentationRagServiceImpl implements DocumentationRagService {
      * Construit le prompt enrichi avec le contexte RAG.
      */
     private String buildRagPrompt(String systemPrompt, String context) {
-
         return systemPrompt
                 + """
 

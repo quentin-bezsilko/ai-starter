@@ -31,11 +31,8 @@ public class DocumentChunkingServiceImpl {
      * Découpe un document Spring AI en plusieurs documents.
      */
     public List<Document> split(Document document) {
-
         List<Document> chunks = textSplitter.apply(List.of(document));
-
         log.debug("Document split into {} chunks", chunks.size());
-
         return chunks;
     }
 
@@ -43,13 +40,11 @@ public class DocumentChunkingServiceImpl {
      * Découpe un contenu textuel en plusieurs fragments.
      */
     public List<String> splitContent(String content) {
-
         if (content == null || content.isBlank()) {
             return List.of();
         }
 
         Document document = new Document(content);
-
         return split(document).stream().map(Document::getText).toList();
     }
 }

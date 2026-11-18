@@ -1,7 +1,7 @@
 services:
 
   postgres:
-    image: postgres:17
+    image: pgvector/pgvector:pg17
     container_name: postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -32,10 +32,11 @@ services:
       - ../liquibase/liquibase.properties:/liquibase/liquibase.properties
       - ../liquibase/lib:/liquibase/lib
     command:
-      - --url=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-      - --username=${POSTGRES_USER}
-      - --password=${POSTGRES_PASSWORD}
-      - --changeLogFile=db.changelog-master.yml
+      - --search-path=/liquibase
+      - --url=jdbc:postgresql://postgres:5432/aistarter
+      - --username=aistarter
+      - --password=aistarter
+      - --changelog-file=changelog/db.changelog-master.yml
       - update
     restart: "no"
 
@@ -72,6 +73,7 @@ services:
       timeout: 5s
       retries: 10
 
+
   ollama-init:
     build:
       context: .
@@ -82,19 +84,18 @@ services:
     environment:
       OLLAMA_HOST: http://ollama:11434
       OLLAMA_MODEL: ${OLLAMA_MODEL}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL}
     restart: "no"
     entrypoint:
       - sh
       - -c
       - |
-        echo "Checking model ${OLLAMA_MODEL}"
-        if ollama list | grep -q "${OLLAMA_MODEL}"; then
-          echo "Model already installed"
-        else
-          echo "Downloading model ${OLLAMA_MODEL}"
-          ollama pull "${OLLAMA_MODEL}"
-        fi
-        echo "Model ready"
+        set -e
+        for model in "$$OLLAMA_MODEL" "$$OLLAMA_EMBEDDING_MODEL"; do
+          echo "Pulling model $$model"
+          ollama pull "$$model"
+        done
+        echo "All models ready"
 
 volumes:
   postgres_data:

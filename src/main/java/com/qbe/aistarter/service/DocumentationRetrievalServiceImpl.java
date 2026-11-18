@@ -26,7 +26,6 @@ public class DocumentationRetrievalServiceImpl {
      * Recherche les chunks les plus pertinents pour une question.
      */
     public List<RetrievedChunk> search(String question) {
-
         return search(question, DEFAULT_TOP_K, DEFAULT_MIN_SIMILARITY);
     }
 
@@ -34,15 +33,12 @@ public class DocumentationRetrievalServiceImpl {
      * Recherche avec un nombre de résultats et un seuil personnalisés.
      */
     public List<RetrievedChunk> search(String question, int topK, double minSimilarity) {
-
         if (!StringUtils.hasText(question)) {
             throw new IllegalArgumentException("Search question cannot be empty");
         }
-
         if (topK < 1 || topK > 100) {
             throw new IllegalArgumentException("topK must be between 1 and 100");
         }
-
         if (minSimilarity < -1 || minSimilarity > 1) {
             throw new IllegalArgumentException("Similarity must be between -1 and 1");
         }
@@ -54,9 +50,7 @@ public class DocumentationRetrievalServiceImpl {
 
         // 2. Recherche vectorielle
         List<RetrievedChunk> results = findSimilarChunks(embedding, topK, minSimilarity);
-
         log.info("Found {} relevant documentation chunks", results.size());
-
         return results;
     }
 
@@ -64,7 +58,6 @@ public class DocumentationRetrievalServiceImpl {
      * Exécute une recherche par similarité cosinus dans PgVector.
      */
     private List<RetrievedChunk> findSimilarChunks(float[] embedding, int topK, double minSimilarity) {
-
         String sql =
                 """
                 SELECT
@@ -103,7 +96,6 @@ public class DocumentationRetrievalServiceImpl {
     }
 
     private RetrievedChunk mapRetrievedChunk(ResultSet rs) throws SQLException {
-
         return new RetrievedChunk(
                 rs.getObject("chunk_id", UUID.class),
                 rs.getObject("document_id", UUID.class),

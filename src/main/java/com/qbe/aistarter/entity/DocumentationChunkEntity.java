@@ -42,6 +42,7 @@ public class DocumentationChunkEntity {
     @Column(name = "token_count")
     private Integer tokenCount;
 
+    @JdbcTypeCode(SqlTypes.OTHER)
     @Column(columnDefinition = "vector(768)")
     private PGvector embedding;
 

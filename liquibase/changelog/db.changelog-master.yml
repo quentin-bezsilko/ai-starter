@@ -15,5 +15,8 @@ databaseChangeLog:
       file: db/005-insert-documentation-changes.yml
       relativeToChangelogFile: true
   - include:
-        file: db/006-create-documentation-chunk-vector-index.yml
-        relativeToChangelogFile: true
+      file: db/006-create-documentation-chunk-vector-index.yml
+      relativeToChangelogFile: true
+  - include:
+      file: db/007-insert-local-rag-demo-source.yml
+      relativeToChangelogFile: true

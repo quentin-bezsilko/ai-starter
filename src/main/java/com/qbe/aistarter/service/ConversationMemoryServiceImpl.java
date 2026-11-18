@@ -3,7 +3,6 @@ package com.qbe.aistarter.service;
 import com.qbe.aistarter.entity.ConversationEntity;
 import com.qbe.aistarter.entity.MessageEntity;
 import com.qbe.aistarter.enums.MessageRole;
-import com.qbe.aistarter.memory.ConversationMemoryService;
 import com.qbe.aistarter.repository.ConversationRepository;
 import com.qbe.aistarter.repository.MessageRepository;
 import java.time.Instant;

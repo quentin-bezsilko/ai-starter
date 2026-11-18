@@ -16,21 +16,17 @@ public class DocumentationEmbeddingServiceImpl implements DocumentationEmbedding
 
     @Override
     public float[] generateEmbedding(String content) {
-
         if (!StringUtils.hasText(content)) {
             throw new IllegalArgumentException("Content cannot be empty");
         }
 
         float[] embedding = embeddingModel.embed(content);
-
         validateEmbedding(embedding);
-
         return embedding;
     }
 
     @Override
     public List<float[]> generateEmbeddings(List<String> contents) {
-
         if (contents == null || contents.isEmpty()) {
             return List.of();
         }
@@ -42,15 +38,12 @@ public class DocumentationEmbeddingServiceImpl implements DocumentationEmbedding
         log.info("Generating embeddings for {} chunks", contents.size());
 
         List<float[]> embeddings = embeddingModel.embed(contents);
-
         if (embeddings.size() != contents.size()) {
             throw new IllegalStateException("Embedding count does not match input count");
         }
 
         embeddings.forEach(this::validateEmbedding);
-
         log.info("Successfully generated {} embeddings", embeddings.size());
-
         return embeddings;
     }
 

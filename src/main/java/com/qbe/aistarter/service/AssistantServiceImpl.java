@@ -3,7 +3,6 @@ package com.qbe.aistarter.service;
 import com.qbe.aistarter.dto.ExpertAnswerResponseDto;
 import com.qbe.aistarter.enums.ResponseLevelDto;
 import com.qbe.aistarter.loader.PromptLoaderImpl;
-import com.qbe.aistarter.memory.ConversationMemoryService;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

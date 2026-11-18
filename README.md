@@ -1,6 +1,6 @@
 # Assistant code
 
-Le dépôt est en pleine transition : il part d’une démo de planification de voyage et devient un assistant technique basé sur Spring AI. Le code présent couvre déjà les questions-réponses, les profils de réponse, la mémoire conversationnelle, l’historisation et une première chaîne RAG. La démo RAG n’est toutefois pas encore complète de bout en bout : les sources documentaires insérées par les migrations sont des URL Web, alors que le seul lecteur actuellement implémenté sait lire des fichiers Markdown.
+Le dépôt évolue d’une démo de planification de voyage vers un assistant technique Spring AI. Il couvre les questions-réponses avec profils, la mémoire conversationnelle, l’historisation et un pipeline RAG. Celui-ci accepte une source Markdown locale pour une démo reproductible ainsi que des sources Web limitées par hôte autorisé et profondeur de crawl.
 
 Ce que fait le projet aujourd’hui
 
@@ -21,21 +21,20 @@ L’environnement Docker Compose prévoit PostgreSQL, Liquibase, Ollama et l’a
 
 État d’avancement et principaux écarts
 
-L’historique Git contient deux commits sur main : l’initialisation du projet, puis un commit d’avancement MCD/RAG. Le travail en cours est important et non committé : il remplace plusieurs composants de voyage par les contrôleurs, services, entités, dépôts, lecteurs et migrations de l’assistant technique. Des traces de l’ancienne démo subsistent — par exemple TravelMcp, dont les outils sont commentés, et le nom ai-travel-assistant dans Compose.
+Des traces de l’ancienne démo subsistent — par exemple `TravelMcp`, dont les outils sont commentés, et le nom `ai-travel-assistant` dans Compose.
 
-Le README indique comme testés manuellement la mémoire, la sauvegarde en base et les profils. Je n’ai trouvé aucun fichier de test dans src/test, donc ces résultats ne sont pas couverts par des tests automatisés identifiables. Le POM configure en outre une exigence de couverture JaCoCo de 85 % pour verify.
+Le README historique indique que la mémoire, la sauvegarde en base et les profils ont été testés manuellement. Un test unitaire couvre maintenant les règles d’URL du lecteur Web ; les parcours complets avec PostgreSQL, Ollama et PgVector restent à valider. Le POM exige une couverture JaCoCo de 85 % pendant `verify`.
 
-L’écart bloquant pour le RAG est l’ingestion : les sources ajoutées par Liquibase sont de type WEB, mais le seul DocumentationContentReader concret est MarkdownDocumentReader, qui accepte des fichiers .md/.markdown. Le démarrage de l’ingestion de ces sources Web ne peut donc pas fonctionner comme prévu. Les dépendances Tika et Jsoup sont présentes, mais aucun lecteur correspondant n’apparaît dans le code examiné. Par ailleurs, l’ingestion est déclenchée directement depuis le contrôleur, sans file de travaux asynchrones. Le code de sauvegarde est annoté @Transactional, mais appelé depuis la même classe ; cet appel interne ne passe pas par le proxy Spring, ce qui mérite d’être corrigé pour garantir une ingestion atomique.
+Les lecteurs Markdown et Web produisent chacun des documents indexables ; le lecteur Web vérifie l’hôte exact, refuse les redirections, limite la profondeur à 3 et le crawl à 50 pages. La persistance des documents et fragments est maintenant séparée dans un service transactionnel. L’ingestion reste synchrone et les parcours complets doivent être vérifiés avec les services Docker.
 
 Le tool calling/MCP, la génération d’artefacts/PDF et le serveur MCP ne sont pas actifs dans la version actuelle. La compilation de l’état courant n’a pas pu être confirmée : l’exécution du wrapper Maven a échoué à cause du chemin réseau UNC utilisé par l’environnement Windows.
 
-Plan proposé pour terminer la démo Spring AI
+Reste à valider pour terminer la démo Spring AI
 
-1. Stabiliser l’état actuel : vérifier migrations, configuration et démarrage complet de PostgreSQL, Liquibase, Ollama et l’application ; confirmer une compilation propre et corriger les éventuels problèmes rencontrés.
-2. Choisir un périmètre RAG démontrable : pour une démo fiable, commencer avec un petit document Markdown local connu. Puis ajouter un lecteur Web — en tenant compte de allowedHost et des limites de crawl — si l’ingestion des URL officielles est nécessaire.
-3. Valider les parcours de bout en bout : tester les trois profils, la création et la réutilisation d’une conversation, la mémoire entre deux questions, puis la recherche RAG avec sources et le comportement quand aucune source n’est pertinente.
-4. Rendre ces résultats reproductibles : ajouter des tests ciblés pour ces comportements et documenter les commandes de démarrage, d’ingestion et de démonstration. Ajouter une route de lecture d’historique si la persistance doit être visible via l’API.
-5. Garder les extensions pour après la démo de base : structured output, outils/MCP, génération PDF et observabilité plus complète. Le README les présente comme objectifs, mais ils ne sont pas nécessaires pour démontrer le flux assistant + mémoire + RAG.
+1. Confirmer compilation, migrations Liquibase et démarrage Docker complet.
+2. Ingérer la source Markdown locale, vérifier les fragments en base et tester une réponse avec ses sources.
+3. Vérifier les cas sans résultat, les réingestions idempotentes et une source Web réelle à faible profondeur.
+4. Ajouter les tests d’intégration manquants ; garder structured output, outils/MCP, PDF et observabilité pour une étape ultérieure.
 
 TODO :
 - (ok) tester la conversation avec la mémoire (vérifier s'il se souvient du prénom par exemple)
@@ -95,6 +94,7 @@ Spring AI : MessageChatMemoryAdvisor
 Documentation officielle Spring Boot, Spring AI, Kafka, Kafka Streams, Angular, PostgreSQL, Liquibase
 Ingestion pdf, md, html et txt. 
 Embeddings + Vector Store (PgVector)
+=> TEST KO : Ingestion des documents ne fonctionne pas (problème de certificat)
 
 7. Sources Documentaires Versionnées
 Avec Spring AI 1.1, Kafka 4
@@ -324,3 +324,31 @@ coding-mentor
 │   └── prompt-engineering.md
 │
 └── docker-compose.yml
+
+## Démonstration RAG locale
+
+La migration Liquibase ajoute une source Markdown locale (`Spring AI RAG demo (local Markdown)`) afin de valider l'ingestion et la recherche sans dépendre d'un site externe. Les sources Web utilisent un lecteur limité à l'hôte `allowed_host`, aux pages HTML, à une profondeur maximale de 3 et à 50 pages par ingestion. Les redirections ne sont pas suivies.
+
+Depuis la racine du dépôt, construire le JAR puis démarrer les services :
+
+```shell
+./mvnw -DskipTests package
+docker compose --file docker/docker-compose.yml --env-file docker/.env up --build
+```
+
+Une fois l'application démarrée, lister les sources, puis copier l'UUID de la source locale :
+
+```shell
+curl http://localhost:8080/aistarter/api/v1/documentation/sources
+curl -X POST http://localhost:8080/aistarter/api/v1/documentation/sources/<UUID>/ingest
+```
+
+Poser une question sur le document ingéré :
+
+```shell
+curl -X POST http://localhost:8080/aistarter/api/v1/assistant/question/rag \
+  -H "Content-Type: application/json" \
+  -d '{"question":"Comment le projet utilise-t-il PgVector pour répondre avec du contexte documentaire ?","responseLevel":"EXPERT"}'
+```
+
+La réponse contient le texte généré et les fragments sources avec leur URL et leur score de similarité. La première ingestion génère les embeddings via Ollama ; les suivantes ignorent les pages dont l'URL et le contenu n'ont pas changé. Pour éviter les téléchargements et le temps de traitement variables, utiliser l'UUID de la source Markdown plutôt que la route `ingest-all` pendant la démo.
