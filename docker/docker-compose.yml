@@ -29,6 +29,7 @@ services:
         condition: service_healthy
     volumes:
       - ../liquibase/changelog:/liquibase/changelog
+      - ../liquibase/data:/liquibase/data
       - ../liquibase/liquibase.properties:/liquibase/liquibase.properties
       - ../liquibase/lib:/liquibase/lib
     command:

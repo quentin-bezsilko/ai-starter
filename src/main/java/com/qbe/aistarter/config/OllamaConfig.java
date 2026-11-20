@@ -1,7 +1,7 @@
 package com.qbe.aistarter.config;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class OllamaConfig {
 
     @Bean
-    ChatClient chatClient(OllamaChatModel chatModel) {
-        return ChatClient.create(chatModel);
+    ChatClient chatClient(ChatClient.Builder chatClientBuilder, ToolCallbackProvider toolCallbackProvider) {
+        return chatClientBuilder.defaultTools(toolCallbackProvider).build();
     }
 }

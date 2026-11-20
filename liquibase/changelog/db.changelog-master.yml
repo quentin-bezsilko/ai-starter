@@ -3,20 +3,20 @@ databaseChangeLog:
       file: db/001-create-spring-ai-chat-memory.yml
       relativeToChangelogFile: true
   - include:
-      file: db/002-create-conversation.yml
+      file: db/002-create-conversation-table.yml
       relativeToChangelogFile: true
   - include:
-      file: db/003-create-message.yml
+      file: db/003-create-message-table.yml
       relativeToChangelogFile: true
   - include:
-      file: db/004-create-documentation-tables.yml
+      file: db/004-create-continent-table.yml
       relativeToChangelogFile: true
   - include:
-      file: db/005-insert-documentation-changes.yml
+      file: db/005-create-country-table.yml
       relativeToChangelogFile: true
   - include:
-      file: db/006-create-documentation-chunk-vector-index.yml
+      file: db/006-create-city-table.yml
       relativeToChangelogFile: true
   - include:
-      file: db/007-insert-local-rag-demo-source.yml
+      file: db/007-load-reference-data.yml
       relativeToChangelogFile: true

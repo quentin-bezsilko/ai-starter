@@ -14,16 +14,16 @@ import org.springframework.util.StreamUtils;
 public class PromptLoaderImpl {
 
     private static final String PROMPT_LOCATION = "classpath:prompts/";
-    private static final String SYSTEM_PROMPT = "expert-system.st";
+    private static final String SYSTEM_PROMPT = "expert-assistant.st";
 
     private final ResourceLoader resourceLoader;
 
-    public String loadPrompt(ResponseLevelDto responseLevel) {
+    public String loadPromptByResponseLevel(ResponseLevelDto responseLevel) {
         if (responseLevel == null) {
             throw new IllegalArgumentException("Response level cannot be null");
         }
 
-        String developerPromptFile = responseLevel.name().toLowerCase(Locale.ROOT) + "-developer.st";
+        String developerPromptFile = responseLevel.name().toLowerCase(Locale.ROOT) + "-assistant.st";
 
         String systemPrompt = load(SYSTEM_PROMPT);
         String developerPrompt = load(developerPromptFile);

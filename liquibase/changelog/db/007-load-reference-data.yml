@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-load-continents
+      author: qbe
+      changes:
+        - loadData:
+            tableName: continent
+            file: data/continents.csv
+            relativeToChangelogFile: false
+            separator: ","
+            quotchar: '"'
+  - changeSet:
+      id: 008-load-countries
+      author: qbe
+      changes:
+        - loadData:
+            tableName: country
+            file: data/countries.csv
+            relativeToChangelogFile: false
+            separator: ","
+            quotchar: '"'
+  - changeSet:
+      id: 009-load-cities
+      author: qbe
+      changes:
+        - loadData:
+            tableName: city
+            file: data/cities.csv
+            relativeToChangelogFile: false
+            separator: ","
+            quotchar: '"'
