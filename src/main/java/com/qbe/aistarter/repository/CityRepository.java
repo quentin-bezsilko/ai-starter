@@ -1,8 +1,10 @@
 package com.qbe.aistarter.repository;
 
 import com.qbe.aistarter.entity.CityEntity;
-import java.util.*;
-import org.springframework.data.jpa.repository.*;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface CityRepository extends JpaRepository<CityEntity, Long> {
@@ -14,6 +16,7 @@ public interface CityRepository extends JpaRepository<CityEntity, Long> {
             join c.country co
             where lower(co.name) = lower(:country)
               and c.capital = true
+            order by c.name
             """)
     Optional<String> findCapitalByCountry(@Param("country") String country);
 
@@ -23,7 +26,7 @@ public interface CityRepository extends JpaRepository<CityEntity, Long> {
             from CityEntity c
             join c.country co
             join co.continent continent
-            where continent.code = 'EU'
+            where upper(continent.code) = 'EU'
               and c.capital = true
             order by c.name
             """)
@@ -35,7 +38,7 @@ public interface CityRepository extends JpaRepository<CityEntity, Long> {
             from CityEntity c
             join c.country co
             join co.continent continent
-            where continent.code in ('NA','SA')
+            where upper(continent.code) in ('NA', 'SA')
               and c.capital = true
             order by c.name
             """)
@@ -51,10 +54,11 @@ public interface CityRepository extends JpaRepository<CityEntity, Long> {
             """)
     List<String> findCitiesByCountryCode(@Param("countryCode") String countryCode);
 
-    @Query("""
-       select c
-       from CityEntity c
-       where lower(c.name) = lower(:city)
-       """)
-    Optional<CityEntity> findByName(String city);
+    @Query(
+            """
+            select c
+            from CityEntity c
+            where lower(c.name) = lower(:city)
+            """)
+    Optional<CityEntity> findByName(@Param("city") String city);
 }

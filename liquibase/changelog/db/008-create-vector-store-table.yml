@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-create-vector-store-table
+      author: qbe
+      changes:
+        - sql:
+            sql: CREATE EXTENSION IF NOT EXISTS vector;
+        - createTable:
+            tableName: vector_store
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: content
+                  type: text
+              - column:
+                  name: metadata
+                  type: jsonb
+              - column:
+                  name: embedding
+                  type: vector(768)

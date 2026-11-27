@@ -41,11 +41,10 @@ services:
       - update
     restart: "no"
 
-  app:
+  ai-starter-app:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: ai-travel-assistant
     ports:
       - "${SERVER_PORT}:8080"
     env_file:
@@ -67,13 +66,16 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    environment:
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_KEEP_ALIVE: "10m"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "ollama", "list"]
+      test: [ "CMD", "ollama", "list" ]
       interval: 10s
       timeout: 5s
       retries: 10
-
 
   ollama-init:
     build:

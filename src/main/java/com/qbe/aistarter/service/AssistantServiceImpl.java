@@ -2,7 +2,7 @@ package com.qbe.aistarter.service;
 
 import com.qbe.aistarter.dto.LlmResponseDto;
 import com.qbe.aistarter.enums.ResponseLevelDto;
-import com.qbe.aistarter.loader.PromptLoaderImpl;
+import com.qbe.aistarter.loader.PromptLoader;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class AssistantServiceImpl implements AssistantService {
 
     private final ChatClient chatClient;
-    private final PromptLoaderImpl promptLoader;
+    private final PromptLoader promptLoader;
     private final MessageChatMemoryAdvisor chatMemoryAdvisor;
     private final ConversationService conversationMemoryService;
 

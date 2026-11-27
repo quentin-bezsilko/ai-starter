@@ -612,14 +612,24 @@ Informations pratiques
 
 🚀 Mise en place du RAG
 
-- Embeddings
-- Vector Store
-- Indexation documentaire
-- Recherche sémantique
+POST /api/rag/upload	
+file (Form-Data, PDF)	Indexe un nouveau PDF ou remplace automatiquement sa version existante dans PGVector.
+GET	/api/rag/ask	
+question (obligatoire) fileName (optionnel)	Pose une question sur l'ensemble des PDF (ou uniquement sur fileName) et retourne la réponse + les sources exactes.
+GET	/api/rag/documents	
+Liste tous les PDF actuellement indexés ainsi que leur nombre de chunks.
+DELETE /api/rag/documents/{fileName}	
+fileName (Path variable)	Supprime tous les vecteurs associés à un PDF donné dans PGVector.
+
+Le PdfDocumentService sauvegarde / remplace le contenu d'un PDF dans le Vector Postgres
+
+Recette OK
 
 ---
 
 ## Sprint 3
+
+/!\ Penser à améliorer les performances d'Ollama (ex: augmenter la mémoire allouée, vérifier les paramètres de thread, etc.) pour éviter les lenteurs lors des appels LLM.
 
 🚀 API Conversations
 
@@ -633,9 +643,45 @@ Informations pratiques
 
 🚀 Observabilité
 
+- Opentelemetry
 - Prometheus
 - Grafana
+- Loki
+- Tempo
 - Dashboards métier IA
+
+Part 2 : Les métriques indispensables à mettre en place
+Pour piloter efficacement ton application Spring Boot (spécialement orientée IA/RAG/MCP), voici les compteurs et histogrammes clés à exposer via Micrometer :
+
+1. Performance de l'API & Infrastructure
+   http_server_requests_seconds (Histogramme) : Latence des requêtes HTTP par endpoint (percentiles p50, p95, p99).
+
+http_server_requests_errors_total (Compteur) : Nombre d'erreurs HTTP (4xx, 5xx) ventilées par type d'erreur.
+
+jvm_memory_used_bytes / jvm_gc_memory_allocated_bytes_total : Surveillance de la mémoire JVM (crucial avec Spring Boot sous forte charge).
+
+2. Métriques spécifiques au RAG
+   rag_retrieval_duration_seconds (Histogramme) : Temps pris pour interroger la base vectorielle.
+
+rag_chunks_retrieved_count (Histogramme / Jauge) : Nombre de documents/chunks ramenés par la recherche (pour vérifier qu'on ne sature pas la fenêtre de contexte).
+
+rag_similarity_score (Histogramme) : Score de similarité moyen des documents trouvés (pour détecter si le système récupère du contenu pertinent ou du bruit).
+
+rag_zero_results_total (Compteur) : Nombre de requêtes où la base vectorielle n'a rien trouvé du tout.
+
+3. Métriques FinOps & LLM (Tokens & Coûts)
+   llm_prompt_tokens_total (Compteur) : Nombre cumulé de tokens envoyés en entrée aux modèles.
+
+llm_completion_tokens_total (Compteur) : Nombre cumulé de tokens générés en sortie par les modèles.
+
+llm_inference_duration_seconds (Histogramme) : Temps de réponse global du LLM et temps par token (pour mesurer la réactivité).
+
+4. Métriques des MCP (Appels d'outils)
+   mcp_tool_calls_total (Compteur) : Nombre d'appels effectués par outil MCP (étiqueté par nom d'outil : ex: tool=search_db, tool=calculate_tax).
+
+mcp_tool_errors_total (Compteur) : Nombre d'échecs lors de l'exécution des MCP (timeouts, erreurs de payload).
+
+mcp_tool_duration_seconds (Histogramme) : Temps d'exécution de chaque outil externe appelé par l'agent.
 
 ---
 
@@ -658,3 +704,8 @@ Informations pratiques
 - Raisonnement multi-étapes
 - RAG + MCP combinés
 - Génération de plans et recommandations
+
+## Spring 7
+
+- Créer les tests unitaires
+- Passer Sonar sur le projet

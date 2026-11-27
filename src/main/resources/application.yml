@@ -19,6 +19,12 @@ spring:
         repository:
           jdbc:
             initialize-schema: never
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 768
   mcp:
     server:
       name: geography-mcp
@@ -36,6 +42,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
 springdoc:
   api-docs:
